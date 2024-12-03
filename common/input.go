@@ -22,11 +22,15 @@ func AsInts(in iter.Seq[[]string]) iter.Seq[[]int] {
 	}
 }
 
+func Input() []byte {
+	return net(os.ReadFile("input.txt"))
+}
+
 func InputLines() iter.Seq[[]string] {
 	return func(yield func([]string) bool) {
-        f := net(os.Open("input.txt"))
-        defer f.Close()
-        s := bufio.NewScanner(f)
+		f := net(os.Open("input.txt"))
+		defer f.Close()
+		s := bufio.NewScanner(f)
 		for s.Scan() {
 			ns := strings.Split(s.Text(), " ")
 			line := make([]string, 0, 100)

@@ -7,18 +7,18 @@ import (
 
 func main() {
     fmt.Println("Part 1:")
-	part1()
+	fmt.Println(Part1())
     fmt.Println("Part 2:")
-	part2()
+    fmt.Println(Part2())
 }
 
-func part1() {
+func Part1() int {
     for line := range(common.AsInts(common.InputLines())) {
         fmt.Println(line)
     }
+    return 0
 }
-func part2() {
+func Part2() int {
 	// lines := common.GetInputs()
-	count := 0
-	fmt.Println(count)
+    return 0
 }

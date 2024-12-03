@@ -8,12 +8,12 @@ import (
 
 func main() {
     fmt.Println("Part 1:")
-    part1()
+    fmt.Println(Part1())
     fmt.Println("Part 2:")
-    part2()
+    fmt.Println(Part2())
 }
 
-func part1() {
+func Part1() int {
     r := make([]int, 0)
     l := make([]int, 0)
     for line := range(common.AsInts(common.InputLines())) {
@@ -26,10 +26,10 @@ func part1() {
     for i := 0; i < len(r); i++ {
         sum += common.Abs(r[i] - l[i])
     }
-    fmt.Println(sum)
+    return sum
 }
 
-func part2() {
+func Part2() int {
     r := make(map[int]int)
     l := make([]int, 0)
     for line := range(common.AsInts(common.InputLines())) {
@@ -48,5 +48,5 @@ func part2() {
             sum += val * l[i]
         } 
     }
-    fmt.Println(sum)
+    return sum
 }

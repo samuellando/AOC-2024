@@ -9,28 +9,28 @@ import (
 
 func main() {
 	fmt.Println("Part 1:")
-	part1()
+	fmt.Println(Part1())
 	fmt.Println("Part 2:")
-	part2()
+	fmt.Println(Part2())
 }
 
-func part1() {
+func Part1() int {
 	count := 0
 	for line := range common.AsInts(common.InputLines()) {
 		if isSafe(line) {
 			count++
 		}
 	}
-	fmt.Println(count)
+    return count
 }
-func part2() {
+func Part2() int {
 	count := 0
 	for line := range common.AsInts(common.InputLines()) {
 		if common.Any(common.Map(generateWithRemoval(line, 1), isSafe)) {
 			count++
 		}
 	}
-	fmt.Println(count)
+    return count
 }
 
 func generateWithRemoval(report []int, remove int) iter.Seq[[]int] {
