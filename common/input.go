@@ -1,35 +1,44 @@
 package common
 
 import (
-    "os"
-    "bufio"
-    "strings"
-    "strconv"
+	"bufio"
+	"iter"
+	"os"
+	"strconv"
+	"strings"
 )
 
-func GetInputs() [][]int {
-	f, err := os.Open("input.txt")
-    defer f.Close()
-	if err != nil {
-		panic(err)
-	}
-	s := bufio.NewScanner(f)
-    lines := make([][]int, 0, 1000)
-
-	for s.Scan() {
-		ns := strings.Split(s.Text(), " ")
-		line := make([]int, 0, 100)
-		for _, ss := range ns {
-            if ss == "" {
-                continue
-            }
-			value, err := strconv.Atoi(ss)
-			if err != nil {
-				panic(err)
+func AsInts(in iter.Seq[[]string]) iter.Seq[[]int] {
+	return func(yield func([]int) bool) {
+		for line := range in {
+			iline := make([]int, 0, len(line))
+			for _, s := range line {
+				iline = append(iline, net(strconv.Atoi(s)))
 			}
-            line = append(line, value)
+			if !yield(iline) {
+				return
+			}
 		}
-        lines = append(lines, line)
 	}
-    return lines
+}
+
+func InputLines() iter.Seq[[]string] {
+	return func(yield func([]string) bool) {
+        f := net(os.Open("input.txt"))
+        defer f.Close()
+        s := bufio.NewScanner(f)
+		for s.Scan() {
+			ns := strings.Split(s.Text(), " ")
+			line := make([]string, 0, 100)
+			for _, ss := range ns {
+				if ss == "" {
+					continue
+				}
+				line = append(line, ss)
+			}
+			if !yield(line) {
+				return
+			}
+		}
+	}
 }

@@ -14,10 +14,9 @@ func main() {
 }
 
 func part1() {
-    lines := common.GetInputs()
     r := make([]int, 0)
     l := make([]int, 0)
-    for _, line := range(lines) {
+    for line := range(common.AsInts(common.InputLines())) {
         r = append(r, line[0])
         l = append(l, line[len(line) - 1])
     }
@@ -31,10 +30,9 @@ func part1() {
 }
 
 func part2() {
-    lines := common.GetInputs()
     r := make(map[int]int)
     l := make([]int, 0)
-    for _, line := range(lines) {
+    for line := range(common.AsInts(common.InputLines())) {
         ri := line[0]
         li := line[len(line) - 1]
         if _, ok := r[ri]; ok {

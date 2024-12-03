@@ -3,20 +3,20 @@ package main
 import (
 	"advent/common"
 	"fmt"
+	"iter"
 	"slices"
 )
 
 func main() {
-    fmt.Println("Part 1:")
+	fmt.Println("Part 1:")
 	part1()
-    fmt.Println("Part 2:")
+	fmt.Println("Part 2:")
 	part2()
 }
 
 func part1() {
-	lines := common.GetInputs()
 	count := 0
-	for _, line := range lines {
+	for line := range common.AsInts(common.InputLines()) {
 		if isSafe(line) {
 			count++
 		}
@@ -24,9 +24,8 @@ func part1() {
 	fmt.Println(count)
 }
 func part2() {
-	lines := common.GetInputs()
 	count := 0
-	for _, line := range lines {
+	for line := range common.AsInts(common.InputLines()) {
 		if common.Any(common.Map(generateWithRemoval(line, 1), isSafe)) {
 			count++
 		}
@@ -34,38 +33,19 @@ func part2() {
 	fmt.Println(count)
 }
 
-func generateWithRemoval(report []int, remove int) func() ([]int, bool) {
-	if remove < 0 {
-		return func() ([]int, bool) {
-			return nil, false
+func generateWithRemoval(report []int, remove int) iter.Seq[[]int] {
+	if remove <= 0 {
+		return func(yield func([]int) bool) {
+			yield(report)
+			return
 		}
 	}
-	i := 0
-	inner := generateWithRemoval(report, -1)
-	return func() ([]int, bool) {
-		if remove == 0 {
-			if i == 0 {
-				i++
-				return report, true
-			} else {
-				return nil, false
-			}
-		} else {
-			iv, ok := inner()
-			if ok {
-				return iv, true
-			} else {
-				if i < len(report) {
-					ir := slices.Concat(report[:i], report[i+1:])
-					inner = generateWithRemoval(ir, remove-1)
-					i++
-					v, ok := inner()
-					if !ok {
-						panic("huh")
-					}
-					return v, ok
-				} else {
-					return nil, false
+	return func(yield func([]int) bool) {
+		for i := range len(report) {
+			ir := slices.Concat(report[:i], report[i+1:])
+			for sub := range generateWithRemoval(ir, remove-1) {
+				if !yield(sub) {
+					return
 				}
 			}
 		}
@@ -81,14 +61,12 @@ func isSafe(report []int) bool {
 		common.All(common.Map(pairs(report), diffBelow))
 }
 
-func pairs(line []int) func() ([]int, bool) {
-	i := 0
-	return func() ([]int, bool) {
-		if i < len(line)-1 {
-			i++
-			return []int{line[i-1], line[i]}, true
-		} else {
-			return nil, false
+func pairs(line []int) iter.Seq[[]int] {
+	return func(yeild func([]int) bool) {
+		for i := 1; i < len(line); i++ {
+			if !yeild([]int{line[i-1], line[i]}) {
+				return
+			}
 		}
 	}
 }

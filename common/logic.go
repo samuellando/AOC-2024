@@ -1,38 +1,33 @@
 package common
 
-func Map[T, G any](itter func() (T, bool), f func(T) G) func() (G, bool) {
-    return func() (G, bool) {
-        var zero G
-        in, ok := itter()
-        if !ok {
-            return zero, false
-        } else {
-            return f(in), true
+import (
+    "iter"
+)
+
+func Map[T, G any](in iter.Seq[T], f func(T) G) iter.Seq[G] {
+    return func(yeild func(G) bool) {
+        for v := range(in) {
+            if !yeild(f(v)) {
+                return
+            }
         }
     }
 }
 
-func Any(itter func() (bool, bool)) bool {
-    for {
-        val, ok := itter()
-        if !ok {
-            break
-        } else if val {
+func Any(in iter.Seq[bool]) bool {
+    for v := range(in) {
+        if v {
             return true
         }
     }
     return false
 }
 
-func All(itter func() (bool, bool))  bool {
-    for {
-        val, ok := itter()
-        if !ok {
-            break
-        } else if !val {
+func All(in iter.Seq[bool])  bool {
+    for v := range(in){
+        if !v {
             return false
         }
     }
     return true
 }
-

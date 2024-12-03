@@ -13,8 +13,9 @@ func main() {
 }
 
 func part1() {
-	lines := common.GetInputs()
-	fmt.Println(lines)
+    for line := range(common.AsInts(common.InputLines())) {
+        fmt.Println(line)
+    }
 }
 func part2() {
 	// lines := common.GetInputs()
