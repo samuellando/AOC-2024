@@ -3,8 +3,35 @@ package main
 import (
 	"advent/common"
 	"fmt"
-	"regexp"
+	"strconv"
 )
+
+var G = common.CreateGrammar(
+	common.CreateRule("root",
+		common.OneOrMoreExpression(
+			common.OrExpression(
+				common.ReferenceExpression("function"),
+				common.ReferenceExpression("curuption")))),
+	common.CreateRule("curuption",
+		common.RegexExpression(`.|\n`)),
+	common.CreateRule("function",
+		common.SeqExpression(
+			common.ReferenceExpression("identifier"),
+			common.TerminalExpression("("),
+			common.ReferenceExpression("args"),
+			common.TerminalExpression(")"))),
+	common.CreateRule("identifier", common.RegexExpression(`(don't|do|mul)`)),
+	common.CreateRule("args",
+		common.OptionalExpression(common.ReferenceExpression("oargs"))),
+	common.CreateRule("oargs",
+		common.OneOrMoreExpression(
+			common.OrExpression(
+				common.SeqExpression(
+					common.ReferenceExpression("arg"),
+					common.TerminalExpression(","),
+					common.ReferenceExpression("oargs")),
+				common.ReferenceExpression("arg")))),
+	common.CreateRule("arg", common.RegexExpression(`\d*`)))
 
 func main() {
 	fmt.Println("Part 1:")
@@ -14,38 +41,60 @@ func main() {
 }
 
 func Part1() int {
-	pattern := regexp.MustCompile(`mul\(\d{1,3},\d{1,3}\)`)
 	input := common.Input()
-	ops := pattern.FindAll(input, -1)
-    sum := 0
-	for _, op := range ops {
-        var d1 int
-        var d2 int
-        fmt.Sscanf(string(op), "mul(%d,%d)", &d1, &d2)
-        sum += d1 * d2
+	t := G.Parse(string(input))
+	fs := t.Filter("function")
+	sum := 0
+	for _, f := range fs {
+		id := f.Filter("identifier")[0].Value()
+		if id == "mul" {
+            sum += evalMul(f)
+		}
 	}
-    return sum
+	return sum
 }
+
 func Part2() int {
-	pattern := regexp.MustCompile(`don't\(\)|do\(\)|mul\(\d{1,3},\d{1,3}\)`)
+	common.Input()
 	input := common.Input()
-	ops := pattern.FindAll(input, -1)
-    sum := 0
-    enabled := true
-	for _, op := range ops {
-        switch string(op) {
-        case "do()":
-            enabled = true
-        case "don't()":
-            enabled = false
-        default:
-            if enabled {
-                var d1 int
-                var d2 int
-                fmt.Sscanf(string(op), "mul(%d,%d)", &d1, &d2)
-                sum += d1 * d2
+	t := G.Parse(string(input))
+	fs := t.Filter("function")
+	sum := 0
+    do := true
+	for _, f := range fs {
+		id := f.Filter("identifier")[0].Value()
+		if id == "mul" {
+            if do {
+                sum += evalMul(f)
             }
-        }
+		} else if id == "do" && evalDo(f) {
+            do = true
+		} else if id == "don't" && evalDont(f) {
+            do = false
+		}
 	}
-    return sum
+	return sum
+}
+
+func evalMul(f common.SyntaxTree) int {
+	args := f.Find("args")
+	if len(args) > 0 {
+		vs := args[0].Find("arg")
+		if len(vs) == 2 {
+			r := common.Net(strconv.Atoi(vs[0].Value()))
+			l := common.Net(strconv.Atoi(vs[1].Value()))
+			return r * l
+		}
+	}
+	return 0
+}
+
+func evalDo(f common.SyntaxTree) bool {
+	args := f.Find("args")
+	return len(args) == 0 
+}
+
+func evalDont(f common.SyntaxTree) bool {
+	args := f.Find("args")
+	return len(args) == 0 
 }

@@ -13,7 +13,7 @@ func AsInts(in iter.Seq[[]string]) iter.Seq[[]int] {
 		for line := range in {
 			iline := make([]int, 0, len(line))
 			for _, s := range line {
-				iline = append(iline, net(strconv.Atoi(s)))
+				iline = append(iline, Net(strconv.Atoi(s)))
 			}
 			if !yield(iline) {
 				return
@@ -23,12 +23,12 @@ func AsInts(in iter.Seq[[]string]) iter.Seq[[]int] {
 }
 
 func Input() []byte {
-	return net(os.ReadFile("input.txt"))
+	return Net(os.ReadFile("input.txt"))
 }
 
 func InputLines() iter.Seq[[]string] {
 	return func(yield func([]string) bool) {
-		f := net(os.Open("input.txt"))
+		f := Net(os.Open("input.txt"))
 		defer f.Close()
 		s := bufio.NewScanner(f)
 		for s.Scan() {
