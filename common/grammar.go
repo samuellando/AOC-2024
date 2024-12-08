@@ -21,7 +21,7 @@ type syntaxTree struct {
 }
 
 func (t *syntaxTree) Find(tag string, recurse ...bool) []SyntaxTree {
-	r := true
+	r := false
 	if len(recurse) > 0 {
 		r = recurse[0]
 	}
