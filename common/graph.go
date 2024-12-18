@@ -1,5 +1,7 @@
 package common
 
+import "strconv"
+
 type Node interface {
 	GetAdj() map[string]Node
 	GetValue() string
@@ -9,6 +11,11 @@ type Node interface {
 type node struct {
 	value string
 	adj   map[string]Node
+}
+
+type indexedAdjNode struct {
+	value string
+	adj   []Node
 }
 
 func CreateNode(value string) Node {
@@ -25,6 +32,27 @@ func (n *node) GetValue() string {
 
 func (n *node) Connect(c Node) Node {
 	n.adj[c.GetValue()] = c
+	return n
+}
+
+func CreateIndexedAdjNode(value string) Node {
+	return &indexedAdjNode{value, make([]Node, 0)}
+}
+
+func (n *indexedAdjNode) GetAdj() map[string]Node {
+    m := make(map[string]Node)
+    for i, n := range(n.adj) {
+        m[strconv.Itoa(i)] = n
+    }
+	return m
+}
+
+func (n *indexedAdjNode) GetValue() string {
+	return n.value
+}
+
+func (n *indexedAdjNode) Connect(c Node) Node {
+    n.adj = append(n.adj, c)
 	return n
 }
 

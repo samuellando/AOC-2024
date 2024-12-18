@@ -27,6 +27,9 @@ func Input() []byte {
 }
 
 func InputLines() iter.Seq[[]string] {
+	/*
+	 * Returns lines splity on spaces
+	 */
 	return func(yield func([]string) bool) {
 		f := Net(os.Open("input.txt"))
 		defer f.Close()
