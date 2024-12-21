@@ -33,9 +33,21 @@ func (q *ringQueue[T]) Enqueue(v T) {
 	}
 }
 
+func (q *ringQueue[T]) Dequeue() T {
+	if q.length > 0 {
+		v := q.values[q.front]
+		q.front = q.nextIndex(q.front)
+		q.length--
+		return v
+	} else {
+		var n T
+		return n
+	}
+}
+
 func (q *ringQueue[T]) nextIndex(i int) int {
 	n := i + 1
-	if i == len(q.values) {
+	if n == len(q.values) {
 		n = 0
 	}
 	return n
@@ -49,16 +61,4 @@ func (q *ringQueue[T]) increaseCapacity() {
 	q.values = new_values
 	q.front = 0
 	q.back = q.length
-}
-
-func (q *ringQueue[T]) Dequeue() T {
-	if q.length > 0 {
-		v := q.values[q.front]
-		q.front++
-		q.length--
-		return v
-	} else {
-		var n T
-		return n
-	}
 }

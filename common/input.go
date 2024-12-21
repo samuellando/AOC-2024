@@ -8,6 +8,11 @@ import (
 	"strings"
 )
 
+func Pause() {
+	input := bufio.NewScanner(os.Stdin)
+	input.Scan()
+}
+
 func AsInts(in iter.Seq[[]string]) iter.Seq[[]int] {
 	return func(yield func([]int) bool) {
 		for line := range in {

@@ -120,7 +120,7 @@ func Part2() int {
 }
 
 func getLevels(orders []common.SyntaxTree, filter map[string]bool) (map[string]int, error) {
-	g := common.CreateGraph()
+	g := common.CreateGraph[string]()
 	for _, order := range orders {
 		numbers := order.Find("num")
 		start := numbers[0].Value()
@@ -128,8 +128,8 @@ func getLevels(orders []common.SyntaxTree, filter map[string]bool) (map[string]i
         if !filter[start] {
             continue
         }
-		var s common.Node
-		var e common.Node
+		var s common.Node[string]
+		var e common.Node[string]
 		if g.GetNode(start) == nil {
 			s = common.CreateNode(start)
 			g.AddNode(s)
@@ -157,8 +157,8 @@ func getLevels(orders []common.SyntaxTree, filter map[string]bool) (map[string]i
 	return m, nil
 }
 
-func getOrder(orders []common.SyntaxTree, filter map[string]bool) ([][]common.Node, error) {
-	g := common.CreateGraph()
+func getOrder(orders []common.SyntaxTree, filter map[string]bool) ([][]common.Node[string], error) {
+	g := common.CreateGraph[string]()
 	for _, order := range orders {
 		numbers := order.Find("num")
 		start := numbers[0].Value()
@@ -166,8 +166,8 @@ func getOrder(orders []common.SyntaxTree, filter map[string]bool) ([][]common.No
         if !filter[start] {
             continue
         }
-		var s common.Node
-		var e common.Node
+		var s common.Node[string]
+		var e common.Node[string]
 		if g.GetNode(start) == nil {
 			s = common.CreateNode(start)
 			g.AddNode(s)

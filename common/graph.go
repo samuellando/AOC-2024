@@ -1,94 +1,99 @@
 package common
 
-import "strconv"
+import (
+	"fmt"
+	"strconv"
+)
 
-type Node interface {
-	GetAdj() map[string]Node
-	GetValue() string
-	Connect(Node) Node
+type Node[T any] interface {
+	GetAdj() map[string]Node[T]
+	GetValue() T
+	Connect(Node[T]) Node[T]
 }
 
-type node struct {
-	value string
-	adj   map[string]Node
+type node[T any] struct {
+	value T
+	adj   map[string]Node[T]
 }
 
-type indexedAdjNode struct {
-	value string
-	adj   []Node
+type indexedAdjNode[T any] struct {
+	value T
+	adj   []Node[T]
 }
 
-func CreateNode(value string) Node {
-	return &node{value, make(map[string]Node, 0)}
+func CreateNode[T any](value T) Node[T] {
+	return &node[T]{value, make(map[string]Node[T], 0)}
 }
 
-func (n *node) GetAdj() map[string]Node {
+func (n *node[T]) GetAdj() map[string]Node[T] {
 	return n.adj
 }
 
-func (n *node) GetValue() string {
+func (n *node[T]) GetValue() T {
 	return n.value
 }
 
-func (n *node) Connect(c Node) Node {
-	n.adj[c.GetValue()] = c
+func (n *node[T]) Connect(c Node[T]) Node[T] {
+    str := fmt.Sprintf("%v", c.GetValue())
+	n.adj[str] = c
 	return n
 }
 
-func CreateIndexedAdjNode(value string) Node {
-	return &indexedAdjNode{value, make([]Node, 0)}
+func CreateIndexedAdjNode[T any](value T) Node[T] {
+	return &indexedAdjNode[T]{value, make([]Node[T], 0)}
 }
 
-func (n *indexedAdjNode) GetAdj() map[string]Node {
-    m := make(map[string]Node)
+func (n *indexedAdjNode[T]) GetAdj() map[string]Node[T] {
+    m := make(map[string]Node[T])
     for i, n := range(n.adj) {
         m[strconv.Itoa(i)] = n
     }
 	return m
 }
 
-func (n *indexedAdjNode) GetValue() string {
+func (n *indexedAdjNode[T]) GetValue() T {
 	return n.value
 }
 
-func (n *indexedAdjNode) Connect(c Node) Node {
+func (n *indexedAdjNode[T]) Connect(c Node[T]) Node[T] {
     n.adj = append(n.adj, c)
 	return n
 }
 
-type Graph interface {
-	AddNode(Node) Graph
-	GetNodes() []Node
-	GetNode(string) Node
+type Graph[T any] interface {
+	AddNode(Node[T]) Graph[T]
+	GetNodes() []Node[T]
+	GetNode(string) Node[T]
 	CheckEdge(string, string) bool
 }
 
-type graph struct {
-	nodes map[string]Node
+type graph[T any] struct {
+	nodes map[string]Node[T]
 }
 
-func CreateGraph() Graph {
-	return &graph{make(map[string]Node)}
+func CreateGraph[T any]() Graph[T] {
+	return &graph[T]{make(map[string]Node[T])}
 }
 
-func (g *graph) AddNode(n Node) Graph {
-	g.nodes[n.GetValue()] = n
+func (g *graph[T]) AddNode(n Node[T]) Graph[T] {
+    str := fmt.Sprintf("%v", n.GetValue())
+	g.nodes[str] = n
 	return g
 }
 
-func (g *graph) GetNodes() []Node {
-	ns := make([]Node, 0)
+func (g *graph[T]) GetNodes() []Node[T] {
+	ns := make([]Node[T], 0)
 	for _, n := range g.nodes {
 		ns = append(ns, n)
 	}
 	return ns
 }
 
-func (g *graph) GetNode(v string) Node {
+func (g *graph[T]) GetNode(v string) Node[T] {
 	return g.nodes[v]
 }
 
-func (g *graph) CheckEdge(v1, v2 string) bool {
+func (g *graph[T]) CheckEdge(v1, v2 string) bool {
 	n, ok := g.nodes[v1]
 	if !ok {
 		return false

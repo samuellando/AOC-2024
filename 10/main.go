@@ -4,7 +4,6 @@ import (
 	"advent/common"
 	"advent/common/datastructures/queue"
 	"fmt"
-	"iter"
 	"strconv"
 )
 
@@ -16,14 +15,14 @@ func main() {
 }
 
 func Part1() int {
-	nodeMatrix := toNodeMatrix(common.InputLines())
-	connectAdjs(nodeMatrix)
+	nodeMatrix := common.StringToNodeMatrix(string(common.Input()))
+	common.ConnectAdjs(nodeMatrix, func(a, b common.Node[string]) bool {return true})
 	starts := getStartNodes(nodeMatrix)
 	// Use BFS to search from each start position
 	total := 0
 	for _, startNode := range starts {
-		visited := make(map[common.Node]bool)
-		q := queue.New[common.Node]()
+		visited := make(map[common.Node[string]]bool)
+		q := queue.New[common.Node[string]]()
 		q.Enqueue(startNode)
 		score := 0
 		for q.Length() > 0 {
@@ -49,26 +48,26 @@ func Part1() int {
 }
 
 func Part2() int {
-	nodeMatrix := toNodeMatrix(common.InputLines())
-	connectAdjs(nodeMatrix)
+	nodeMatrix := common.StringToNodeMatrix(string(common.Input()))
+	common.ConnectAdjs(nodeMatrix, func(a, b common.Node[string]) bool {return true})
 	starts := getStartNodes(nodeMatrix)
 	// Use DFS to search from each start position
 	total := 0
 	for _, startNode := range starts {
-		visited := make(map[common.Node]bool)
+		visited := make(map[common.Node[string]]bool)
 		score := dfs(startNode, visited)
 		total += score
 	}
 	return total
 }
 
-func dfs(n common.Node, visited map[common.Node]bool) int {
+func dfs(n common.Node[string], visited map[common.Node[string]]bool) int {
 	v := common.Net(strconv.Atoi(n.GetValue()))
     if v == 9 {
         return 1
     }
 	count := 0
-	thisVisited := make(map[common.Node]bool)
+	thisVisited := make(map[common.Node[string]]bool)
 	for k, v := range visited {
 		thisVisited[k] = v
 	}
@@ -82,39 +81,8 @@ func dfs(n common.Node, visited map[common.Node]bool) int {
 	return count
 }
 
-func toNodeMatrix(lines iter.Seq[[]string]) [][]common.Node {
-	nodeMatrix := make([][]common.Node, 0)
-	for line := range lines {
-		row := make([]common.Node, 0)
-		for _, c := range line[0] {
-			row = append(row, common.CreateIndexedAdjNode(string(c)))
-		}
-		nodeMatrix = append(nodeMatrix, row)
-	}
-	return nodeMatrix
-}
-
-func connectAdjs(nodeMatrix [][]common.Node) {
-	for i, row := range nodeMatrix {
-		for j, node := range row {
-			if i > 0 {
-				node.Connect(nodeMatrix[i-1][j])
-			}
-			if i < len(nodeMatrix)-1 {
-				node.Connect(nodeMatrix[i+1][j])
-			}
-			if j > 0 {
-				node.Connect(nodeMatrix[i][j-1])
-			}
-			if j < len(row)-1 {
-				node.Connect(nodeMatrix[i][j+1])
-			}
-		}
-	}
-}
-
-func getStartNodes(nodeMatrix [][]common.Node) []common.Node {
-	starts := make([]common.Node, 0)
+func getStartNodes(nodeMatrix [][]common.Node[string]) []common.Node[string] {
+	starts := make([]common.Node[string], 0)
 	for _, row := range nodeMatrix {
 		for _, node := range row {
 			if node.GetValue() == "0" {
