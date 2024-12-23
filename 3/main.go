@@ -42,13 +42,13 @@ func main() {
 
 func Part1() int {
 	input := common.Input()
-	t := G.Parse(string(input))
-	fs := t.Filter("function")
+	t, _ := G.Parse(string(input))
+	fs := t.Find("function")
 	sum := 0
 	for _, f := range fs {
-		id := f.Filter("identifier")[0].Value()
+		id := f.Find("identifier")[0].Value()
 		if id == "mul" {
-            sum += evalMul(f)
+			sum += evalMul(f)
 		}
 	}
 	return sum
@@ -57,20 +57,20 @@ func Part1() int {
 func Part2() int {
 	common.Input()
 	input := common.Input()
-	t := G.Parse(string(input))
-	fs := t.Filter("function")
+	t, _ := G.Parse(string(input))
+	fs := t.Find("function")
 	sum := 0
-    do := true
+	do := true
 	for _, f := range fs {
-		id := f.Filter("identifier")[0].Value()
+		id := f.Find("identifier")[0].Value()
 		if id == "mul" {
-            if do {
-                sum += evalMul(f)
-            }
+			if do {
+				sum += evalMul(f)
+			}
 		} else if id == "do" && evalDo(f) {
-            do = true
+			do = true
 		} else if id == "don't" && evalDont(f) {
-            do = false
+			do = false
 		}
 	}
 	return sum
@@ -91,10 +91,10 @@ func evalMul(f common.SyntaxTree) int {
 
 func evalDo(f common.SyntaxTree) bool {
 	args := f.Find("args")
-	return len(args) == 0 
+	return len(args) == 0
 }
 
 func evalDont(f common.SyntaxTree) bool {
 	args := f.Find("args")
-	return len(args) == 0 
+	return len(args) == 0
 }

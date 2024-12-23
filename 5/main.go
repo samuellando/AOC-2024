@@ -35,16 +35,16 @@ var G = common.CreateGrammar(
 
 func Part1() int {
 	in := string(common.Input())
-	st := G.Parse(in)
+	st, _ := G.Parse(in)
 	orders := st.Find("order")
 	lists := st.Find("list")
 	count := 0
 	for _, list := range lists {
 		numbers := list.Find("num")
-        filter := make(map[string]bool)
-        for _, n := range(numbers) {
-            filter[n.Value()] = true
-        }
+		filter := make(map[string]bool)
+		for _, n := range numbers {
+			filter[n.Value()] = true
+		}
 		levels, err := getLevels(orders, filter)
 		if err != nil {
 			panic(err)
@@ -72,16 +72,16 @@ func Part1() int {
 
 func Part2() int {
 	in := string(common.Input())
-	st := G.Parse(in)
+	st, _ := G.Parse(in)
 	orders := st.Find("order")
 	lists := st.Find("list")
 	count := 0
 	for _, list := range lists {
 		numbers := list.Find("num")
-        filter := make(map[string]bool)
-        for _, n := range(numbers) {
-            filter[n.Value()] = true
-        }
+		filter := make(map[string]bool)
+		for _, n := range numbers {
+			filter[n.Value()] = true
+		}
 		levels, err := getLevels(orders, filter)
 		if err != nil {
 			panic(err)
@@ -99,18 +99,18 @@ func Part2() int {
 			}
 		}
 		if !good {
-            orders, err := getOrder(orders, filter)
-            if err != nil {
-                panic(err)
-            }
-            c := make([]string, 0)
-            for _, level := range(orders) {
-                for _, n := range(level) {
-                    if filter[n.GetValue()] {
-                        c = append(c, n.GetValue())
-                    }
-                }
-            }
+			orders, err := getOrder(orders, filter)
+			if err != nil {
+				panic(err)
+			}
+			c := make([]string, 0)
+			for _, level := range orders {
+				for _, n := range level {
+					if filter[n.GetValue()] {
+						c = append(c, n.GetValue())
+					}
+				}
+			}
 			middle := (len(c) / 2)
 			middleV := common.Net(strconv.Atoi(c[middle]))
 			count += middleV
@@ -125,9 +125,9 @@ func getLevels(orders []common.SyntaxTree, filter map[string]bool) (map[string]i
 		numbers := order.Find("num")
 		start := numbers[0].Value()
 		end := numbers[1].Value()
-        if !filter[start] {
-            continue
-        }
+		if !filter[start] {
+			continue
+		}
 		var s common.Node[string]
 		var e common.Node[string]
 		if g.GetNode(start) == nil {
@@ -163,9 +163,9 @@ func getOrder(orders []common.SyntaxTree, filter map[string]bool) ([][]common.No
 		numbers := order.Find("num")
 		start := numbers[0].Value()
 		end := numbers[1].Value()
-        if !filter[start] {
-            continue
-        }
+		if !filter[start] {
+			continue
+		}
 		var s common.Node[string]
 		var e common.Node[string]
 		if g.GetNode(start) == nil {
@@ -186,5 +186,5 @@ func getOrder(orders []common.SyntaxTree, filter map[string]bool) ([][]common.No
 	if err != nil {
 		return nil, err
 	}
-    return levels, nil
+	return levels, nil
 }

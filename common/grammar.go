@@ -3,6 +3,7 @@ package common
 import (
 	"errors"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -12,7 +13,6 @@ type SyntaxTree interface {
 	SetTag(string)
 	Value() string
 	Find(string, ...bool) []SyntaxTree
-	Filter(string) []SyntaxTree
 }
 
 type syntaxTree struct {
@@ -105,12 +105,8 @@ func (t *token) Find(tag string, recurse ...bool) []SyntaxTree {
 	return []SyntaxTree{}
 }
 
-func (t *token) Filter(tag string) []SyntaxTree {
-	return []SyntaxTree{}
-}
-
 type Grammar interface {
-	Parse(string) SyntaxTree
+	Parse(string) (SyntaxTree, error)
 }
 
 type grammar struct {
@@ -127,15 +123,15 @@ func CreateGrammar(root Rule, rules ...Rule) Grammar {
 	return &grammar{root, ruleSet}
 }
 
-func (g *grammar) Parse(input string) SyntaxTree {
+func (g *grammar) Parse(input string) (SyntaxTree, error) {
 	t, remainder, err := g.root.Parse(input, g.rules)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	if remainder != "" {
-		panic(errors.New("Remaining: " + remainder + " " + t.Tree()))
+		return nil, errors.New("Remaining: " + remainder + " " + t.Tree())
 	}
-	return t
+	return t, nil
 }
 
 type Rule interface {
@@ -277,6 +273,73 @@ func (e *orExpression) Parse(input string, rules map[string]Rule) (SyntaxTree, s
 		return t, remainder, err
 	}
 	return nil, input, errors.New("No option parsed succesfully")
+}
+
+type greedyOrExpression struct {
+	expressions []Expression
+	cache       map[string]cachedResult
+}
+
+type cachedResult struct {
+	t         SyntaxTree
+	remainder string
+	err       error
+}
+
+func GreedyOrExpression(exs ...Expression) Expression {
+	return &greedyOrExpression{exs, make(map[string]cachedResult)}
+}
+
+func (e *greedyOrExpression) Parse(input string, rules map[string]Rule) (SyntaxTree, string, error) {
+	if r, ok := e.cache[input]; ok {
+		return r.t, r.remainder, r.err
+	}
+	for _, ex := range e.expressions {
+		t, remainder, err := ex.Parse(input, rules)
+		if err != nil || len(remainder) != 0 {
+			continue
+		}
+		e.cache[input] = cachedResult{t, remainder, err}
+		return t, remainder, err
+	}
+	e.cache[input] = cachedResult{nil, input, errors.New("No option parsed succesfully")}
+	return nil, input, errors.New("No option parsed succesfully")
+}
+
+type greedyOrExpressionCounter struct {
+	expressions []Expression
+	cache       map[string]cachedResult
+}
+
+func GreedyOrExpressionCounter(exs ...Expression) Expression {
+	return &greedyOrExpressionCounter{exs, make(map[string]cachedResult)}
+}
+
+func (e *greedyOrExpressionCounter) Parse(input string, rules map[string]Rule) (SyntaxTree, string, error) {
+	if r, ok := e.cache[input]; ok {
+		return r.t, r.remainder, r.err
+	}
+	count := 0
+	for _, ex := range e.expressions {
+        t, remainder, err := ex.Parse(input, rules)
+		if err != nil || len(remainder) != 0 {
+			continue
+		}
+        inside := t.Find("greedyOrExpressionCounterResult")
+        ic := 1
+        for _, in := range inside {
+            ic *= Net(strconv.Atoi(in.Value()))
+        }
+		count += ic
+	}
+	if count == 0 {
+		e.cache[input] = cachedResult{nil, input, errors.New("No option parsed succesfully")}
+		return nil, input, errors.New("No option parsed succesfully")
+	} else {
+        t := syntaxTree{"", []SyntaxTree{&token{"greedyOrExpressionCounterResult", strconv.Itoa(count)}}}
+		e.cache[input] = cachedResult{&t, "", nil}
+		return &t, "", nil
+	}
 }
 
 type terminalExpression struct {

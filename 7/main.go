@@ -31,26 +31,26 @@ func main() {
 }
 
 func Part1() int {
-    ops := []func(int, int) int {
-        func(a, b int) int {return a + b}, 
-        func(a, b int) int {return a * b}, 
-    }
+	ops := []func(int, int) int{
+		func(a, b int) int { return a + b },
+		func(a, b int) int { return a * b },
+	}
 	input := string(common.Input())
-	st := G.Parse(input)
-    sum := 0
+	st, _ := G.Parse(input)
+	sum := 0
 	for _, eq := range st.Find("equation") {
 		solution := common.Net(strconv.Atoi(eq.Find("solution")[0].Value()))
 		nums := common.Map(common.ToSeq(eq.Find("nums")[0].Find("num")), func(v common.SyntaxTree) int { return common.Net(strconv.Atoi(v.Value())) })
-        if findOps(solution, ops,  slices.Collect(nums)...) {
-            sum += solution
-        }
+		if findOps(solution, ops, slices.Collect(nums)...) {
+			sum += solution
+		}
 
 	}
 	return sum
 }
 
 func findOps(solution int, ops []func(int, int) int, nums ...int) bool {
-    // Base conditions
+	// Base conditions
 	if len(nums) == 0 {
 		return false
 	}
@@ -58,36 +58,36 @@ func findOps(solution int, ops []func(int, int) int, nums ...int) bool {
 		if solution == nums[0] {
 			return true
 		} else {
-            return false
-        }
+			return false
+		}
 	}
-    // recursive condition
-    for _, op := range(ops) {
-        new := slices.Concat([]int{op(nums[0],nums[1])}, nums[2:])
-        if findOps(solution, ops, new...) {
-            return true
-        }
-    }
-    return false
+	// recursive condition
+	for _, op := range ops {
+		new := slices.Concat([]int{op(nums[0], nums[1])}, nums[2:])
+		if findOps(solution, ops, new...) {
+			return true
+		}
+	}
+	return false
 }
 
 func Part2() int {
-    ops := []func(int, int) int {
-        func(a, b int) int {return a + b}, 
-        func(a, b int) int {return a * b}, 
-        func(a, b int) int {
-            return common.Net(strconv.Atoi(strconv.Itoa(a) + strconv.Itoa(b)))
-        }, 
-    }
+	ops := []func(int, int) int{
+		func(a, b int) int { return a + b },
+		func(a, b int) int { return a * b },
+		func(a, b int) int {
+			return common.Net(strconv.Atoi(strconv.Itoa(a) + strconv.Itoa(b)))
+		},
+	}
 	input := string(common.Input())
-	st := G.Parse(input)
-    sum := 0
+	st, _ := G.Parse(input)
+	sum := 0
 	for _, eq := range st.Find("equation") {
 		solution := common.Net(strconv.Atoi(eq.Find("solution")[0].Value()))
 		nums := common.Map(common.ToSeq(eq.Find("nums")[0].Find("num")), func(v common.SyntaxTree) int { return common.Net(strconv.Atoi(v.Value())) })
-        if findOps(solution, ops,  slices.Collect(nums)...) {
-            sum += solution
-        }
+		if findOps(solution, ops, slices.Collect(nums)...) {
+			sum += solution
+		}
 
 	}
 	return sum

@@ -57,7 +57,7 @@ func loadRobot(config common.SyntaxTree) *robot {
 
 func Part1() int {
 	input := string(common.Input())
-	st := G.Parse(input)
+	st,_ := G.Parse(input)
 	robotConfigs := st.Find("robot")
 	w := 101
 	h := 103
@@ -82,7 +82,7 @@ func Part1() int {
 
 func Part2() int {
 	input := string(common.Input())
-	st := G.Parse(input)
+	st,_ := G.Parse(input)
 	robotConfigs := st.Find("robot")
 	w := 101
 	h := 103

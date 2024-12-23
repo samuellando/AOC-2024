@@ -100,7 +100,7 @@ func loadMachine(st common.SyntaxTree) *machine {
 
 func Part1() int {
 	input := string(common.Input())
-	st := G.Parse(input)
+	st, _ := G.Parse(input)
 	machineConfigs := st.Find("machine")
 	cost := 0
 	for _, config := range machineConfigs {
@@ -119,15 +119,15 @@ func Part1() int {
 
 func Part2() int {
 	input := string(common.Input())
-	st := G.Parse(input)
+	st, _ := G.Parse(input)
 	machineConfigs := st.Find("machine")
 	cost := 0
-    offset := 10000000000000
+	offset := 10000000000000
 	for _, config := range machineConfigs {
 		machine := loadMachine(config)
-		a, b, err := solve(machine.a.dx, machine.a.dy, machine.b.dx, machine.b.dy, machine.prize.x + offset, machine.prize.y + offset)
+		a, b, err := solve(machine.a.dx, machine.a.dy, machine.b.dx, machine.b.dy, machine.prize.x+offset, machine.prize.y+offset)
 		if err == nil {
-			aIsValid := a >= 0 
+			aIsValid := a >= 0
 			bIsValid := b >= 0
 			if aIsValid && bIsValid {
 				cost += 3*a + b
